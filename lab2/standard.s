@@ -8,15 +8,15 @@ goodbye	DEFB	"and good-bye!\n\0"
 
 main	ADR	R0, hello	; printf("Hello ")
 	SVC 	3
-start
-	CMP R0, #10	; while R0 != 10 {// translate to ARM code
-	BEQ skip
+
+	; while R0 != 10 {// translate to ARM code
+
 	SVC	1		; input a character to R0
 	SVC	0		; output the character in R0
-	B start
-skip; }// translate to ARM code
-	
-	ADR	R0, goodbye 	; printf(" and good-bye!")
+
+	; }// translate to ARM code
+
+	ADR	R0, goodbye 	; printf("and good-bye!")
 	SVC	3
 
 	SVC  	2		; stop the program
