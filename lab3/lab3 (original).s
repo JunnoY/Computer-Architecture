@@ -1,4 +1,4 @@
-	B part3 ; part1 or part2 or part3
+	B part1 ; part1 or part2 or part3
 
 buffer	DEFS 100,0
 
@@ -23,42 +23,28 @@ s9	DEFB "twenty\0"
 
 ;************************** part 1 **************************
 printstring
-		LDRB R0, [R1], #1
-		CMP  R0, #0
-		SVCNE 0
-		BNE printstring
-		MOV  R0, #10	; given - output end-of-line R0 has already been signed by #10 which is to start a new line by this time, so the 0s wont be printed out
-		SVC  0		; given
-		MOV  PC, LR	; given
+	MOV  R0,R1	; given
+	SVC  3		; given
+; your code goes here, replacing the previous 2 lines
+	MOV  R0, #10	; given - output end-of-line
+	SVC  0		; given
+	MOV  PC, LR	; given
+
 ;************************** part 2 ***************************
 strcat
-		LDRB R0, [R1], #1
-		CMP  R0, #0
-		BNE  strcat
-		SUB R1, R1, #1
+; your code goes here
+	MOV  PC, LR
 
 strcpy
-	    LDRB R3, [R2], #1 ;the bracket means looking for any address in R2
-		STRB R3, [R1], #1 ;The character in R3 is storing in any address(using square bracket) pointed to R1 and we need to add 1 to store the next character in a different address in R1
-		CMP  R3,  #0
-		BNE  strcpy
-		MOV  PC, LR
+; your code goes here
+	MOV  PC, LR
 
 ;************************** part 3 **************************
 sorted	STR LR, return2	; given
-loop	LDRB R4, [R2], #1
-		LDRB R5, [R3], #1
-		CMP  R4, #0
-		BEQ  return
-		CMP  R5, #0
-		BEQ  return
-		CMP  R4, R5
-		BNE  return
-		B    loop ;for the twentytwo/0= twentytwo/0 case, eventually when the character reaches 0, will go to return 
-return	
-		CMP	 R4, R5
-		LDR  PC, return2 ; given
-		return2 DEFW 0		; given
+; your code goes here
+	LDR  PC, return2 ; given
+return2 DEFW 0		; given
+
 ;*********************** the various parts ********************
 part1	ADR R1, s1
 	BL  printstring
