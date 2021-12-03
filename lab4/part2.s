@@ -39,12 +39,8 @@ pYear		  DEFW	2005	;  pYear = 2005 //or whatever is this year
 ;  R5 = age
 ;  R6 = bDay - originally R0
 
-printAgeHistory	STMFD SP!, {R0-R2,R4-R6}
-
-		LDR	R6, [SP, #(6 + 0) * 4]	; Get parameters from stack
-		LDR	R1, [SP, #(6 + 1) * 4]
-		LDR	R2, [SP, #(6 + 2) * 4]
-
+printAgeHistory	STMFD SP!, {R4-R6}
+	MOV R6, R0
 ;   year = bYear + 1
 		ADD	R4, R2, #1
 ;   age = 1;
@@ -144,7 +140,7 @@ else1
 		SVC	print_char
 
 ; }// end of printAgeHistory
-end2	LDMFD SP!, {R0-R2,R4-R6}
+end2	LDMFD SP!, {R4-R6}
 		MOV	PC, LR
 
 another		DEFB	"Another person",10,0
@@ -157,12 +153,10 @@ main
 	MOV	R6, R4
 
 ; printAgeHistory(pDay, pMonth, 2000)
-		LDR	R0, pDay
+		LDR	R0,pDay
 		LDR	R1, pMonth
 		MOV	R2, #2000
-		STMFD SP!, {R0-R2}
 		BL	printAgeHistory
-		LDMFD SP!, {R0-R2}
 
 ; print("Another person");
 		ADRL	R0, another
@@ -172,9 +166,7 @@ main
 		MOV	R0, #13
 		MOV	R1, #11
 		MOV	R2, #2000
-		STMFD SP!, {R0-R2}		; The STore Multiple mnemonic for PUSH {R0}
 		BL	printAgeHistory
-		LDMFD SP!, {R0-R2}
 
 	; Now check to see if register values intact (Not part of Java)
 	LDR	R0, =&12345678		; Test value

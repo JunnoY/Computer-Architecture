@@ -39,20 +39,8 @@ pYear		  DEFW	2005	;  pYear = 2005 //or whatever is this year
 ;  R5 = age
 ;  R6 = bDay - originally R0
 
-printAgeHistory	STMFD SP!, {R0-R2,R4-R6}
 
-		LDR	R6, [SP, #(6 + 0) * 4]	; Get parameters from stack
-		LDR	R1, [SP, #(6 + 1) * 4]
-		LDR	R2, [SP, #(6 + 2) * 4]
-
-;   year = bYear + 1
-		ADD	R4, R2, #1
-;   age = 1;
-		MOV	R5, #1
-
-; print("This person was born on " + str(bDay) + "/" + str(bMonth) + "/" + str(bYear))
-		ADRL	R0, wasborn
-		SVC	print_str
+printsthedate ;print dates
 		MOV	R0, R6
 		SVC	print_no
 		MOV	R0, #'/'
@@ -65,36 +53,52 @@ printAgeHistory	STMFD SP!, {R0-R2,R4-R6}
 		SVC	print_no
 		MOV	R0, #cLF
 		SVC	print_char
+		MOV PC, LR
+printAgeHistory	STR LR, temp
+		STMFD SP!, {R0-R2,R4-R6,LR}
+
+		LDR	R6, [SP, #(7 + 0) * 4]	; Get parameters from stack
+		LDR	R1, [SP, #(7 + 1) * 4]
+		LDR	R2, [SP, #(7 + 2) * 4]
+
+;   year = bYear + 1
+		ADD	R4, R2, #1
+;   age = 1;
+		MOV	R5, #1
+
+; print("This person was born on " + str(bDay) + "/" + str(bMonth) + "/" + str(bYear))
+		ADRL	R0, wasborn
+		SVC	print_str
+		BL printsthedate  ;BRANCH AND LINK
 
 ; this code does: while year < pYear //{
 loop1	LDR	R0, pYear
 		CMP	R4, R0
-		BHS	end1		; Years are unsigned
+		BHI	end1
+		BLT print1
+		LDR R0, pMonth
+		CMP R1, R0
+		BHI end1
+		BLT print1
+		LDR R0, pDay
+		CMP R6, R0
+		BHS end1
+
+				; Years are unsigned
 ; for part 4, should be changed to:
 ; while year < pYear or
 ;				(year == pYear and bMonth < pMonth) or
 ;				(year == pYear and bMonth == pMonth and bDay < pDay):
 
 ;  print("This person was " + str(age) + " on " + str(bDay) + "/" + str(bMonth) + "/" + str(year))
-		ADRL	R0, was
+print1		ADRL	R0, was
 		SVC	print_str
 		MOV	R0, R5
 		SVC	print_no
 		ADRL	R0, on
 		SVC	print_str
-		MOV	R0, R6
-		SVC	print_no
-		MOV	R0, #'/'
-		SVC	print_char
-		MOV	R0, R1
-		SVC	print_no
-		MOV	R0, #'/'
-		SVC	print_char
-		MOV	R0, R4
-		SVC	print_no
-		MOV	R0, #cLF
-		SVC	print_char
-
+		MOV R2,R4
+		BL printsthedate
 		; year = year + 1
 		ADD	R4, R4, #1
 		; age = age + 1
@@ -109,6 +113,9 @@ end1
 		LDR	R0, pMonth
 		CMP	R1, R0
 		BNE	else1
+		LDR R0, pDay
+		CMP R6, R0
+		BNE else1
 
 ; print("This person is " + str(age) + " today!")
 		ADRL	R0, is
@@ -130,22 +137,14 @@ else1
 		SVC	print_no
 		ADRL	R0, on
 		SVC	print_str
-		MOV	R0, R6
-		SVC	print_no
-		MOV	R0, #'/'
-		SVC	print_char
-		MOV	R0, R1
-		SVC	print_no
-		MOV	R0, #'/'
-		SVC	print_char
-		MOV	R0, R4
-		SVC	print_no
-		MOV	R0, #cLF
-		SVC	print_char
+		MOV R2, R4
+		BL printsthedate
 
 ; }// end of printAgeHistory
-end2	LDMFD SP!, {R0-R2,R4-R6}
+end2	LDMFD SP!, {R0-R2,R4-R6,LR}
+		LDR LR, temp
 		MOV	PC, LR
+temp DEFW 0
 
 another		DEFB	"Another person",10,0
 		ALIGN
